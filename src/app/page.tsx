@@ -1,10 +1,17 @@
-export default function Home() {
-  return (
-    <main style={{ display: 'flex', minHeight: '100vh', alignItems: 'center', justifyContent: 'center', background: '#0a0a0a', color: '#fafafa' }}>
-      <div style={{ textAlign: 'center' }}>
-        <h1 style={{ fontSize: '3rem', marginBottom: '0.5rem' }}>🚀 Ship'd</h1>
-        <p style={{ color: '#888', fontSize: '1.2rem' }}>Your app is live. Start building.</p>
-      </div>
-    </main>
-  )
+import { createClient } from '@/lib/supabase-server'
+import { redirect } from 'next/navigation'
+import { TodoApp } from '@/components/todo-app'
+
+export default async function HomePage() {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+
+  if (!user) redirect('/login')
+
+  const { data: todos } = await supabase
+    .from('todos')
+    .select('*')
+    .order('created_at', { ascending: false })
+
+  return <TodoApp user={user} initialTodos={todos ?? []} />
 }

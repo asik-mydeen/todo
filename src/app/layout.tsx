@@ -1,14 +1,17 @@
 import type { Metadata } from 'next'
+import './globals.css'
 
 export const metadata: Metadata = {
-  title: 'todo',
-  description: 'A simple todo app with Google login',
+  title: 'Todo',
+  description: 'A simple todo app',
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
-      <body style={{ margin: 0, fontFamily: 'system-ui, sans-serif' }}>{children}</body>
+      <body className="bg-zinc-950 text-zinc-100 min-h-screen antialiased">
+        {children}
+      </body>
     </html>
   )
 }
