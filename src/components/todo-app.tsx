@@ -19,6 +19,7 @@ export function TodoApp({ user, initialTodos }: { user: User; initialTodos: Todo
   const [filter, setFilter] = useState<Filter>('all')
   const [editingId, setEditingId] = useState<string | null>(null)
   const [editText, setEditText] = useState('')
+  const [search, setSearch] = useState('')
   const inputRef = useRef<HTMLInputElement>(null)
   const editRef = useRef<HTMLInputElement>(null)
   const supabase = createClient()
@@ -86,6 +87,10 @@ export function TodoApp({ user, initialTodos }: { user: User; initialTodos: Todo
   }
 
   const filtered = todos.filter(t => {
+    // Search filter
+    if (search.trim() && !t.title.toLowerCase().includes(search.trim().toLowerCase())) {
+      return false
+    }
     if (filter === 'active') return !t.completed
     if (filter === 'completed') return t.completed
     return true
@@ -144,6 +149,17 @@ export function TodoApp({ user, initialTodos }: { user: User; initialTodos: Todo
             </button>
           </div>
         </form>
+
+        {/* Search bar */}
+        <div className="mb-6">
+          <input
+            type="text"
+            value={search}
+            onChange={e => setSearch(e.target.value)}
+            placeholder="Search todos..."
+            className="w-full bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-3 text-zinc-100 placeholder:text-zinc-600 focus:outline-none focus:border-zinc-600 focus:ring-1 focus:ring-zinc-600 transition-all"
+          />
+        </div>
 
         {/* Filter tabs */}
         {todos.length > 0 && (
