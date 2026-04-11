@@ -22,6 +22,7 @@ export function TodoApp({ user, initialTodos }: { user: User; initialTodos: Todo
   const inputRef = useRef<HTMLInputElement>(null)
   const editRef = useRef<HTMLInputElement>(null)
   const supabase = createClient()
+  const maxChars = 100
 
   useEffect(() => { inputRef.current?.focus() }, [])
   useEffect(() => { editRef.current?.focus() }, [editingId])
@@ -131,8 +132,9 @@ export function TodoApp({ user, initialTodos }: { user: User; initialTodos: Todo
               ref={inputRef}
               type="text"
               value={input}
-              onChange={e => setInput(e.target.value)}
+              onChange={e => setInput(e.target.value.slice(0, maxChars))}
               placeholder="What needs to be done?"
+              maxLength={maxChars}
               className="flex-1 bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-3 text-zinc-100 placeholder:text-zinc-600 focus:outline-none focus:border-zinc-600 focus:ring-1 focus:ring-zinc-600 transition-all"
             />
             <button
@@ -142,6 +144,9 @@ export function TodoApp({ user, initialTodos }: { user: User; initialTodos: Todo
             >
               Add
             </button>
+          </div>
+          <div className="mt-1 text-xs text-zinc-500 text-right px-1">
+            {input.length}/{maxChars} characters
           </div>
         </form>
 
