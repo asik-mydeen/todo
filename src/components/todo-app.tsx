@@ -19,6 +19,7 @@ export function TodoApp({ user, initialTodos }: { user: User; initialTodos: Todo
   const [filter, setFilter] = useState<Filter>('all')
   const [editingId, setEditingId] = useState<string | null>(null)
   const [editText, setEditText] = useState('')
+  const [savingEditId, setSavingEditId] = useState<string | null>(null)
   const inputRef = useRef<HTMLInputElement>(null)
   const editRef = useRef<HTMLInputElement>(null)
   const supabase = createClient()
@@ -67,9 +68,11 @@ export function TodoApp({ user, initialTodos }: { user: User; initialTodos: Todo
   const saveEdit = async (id: string) => {
     const title = editText.trim()
     if (!title) return deleteTodo(id)
+    setSavingEditId(id)
     setTodos(prev => prev.map(t => t.id === id ? { ...t, title } : t))
     setEditingId(null)
     await supabase.from('todos').update({ title }).eq('id', id)
+    setSavingEditId(null)
   }
 
   const clearCompleted = async () => {
@@ -187,17 +190,26 @@ export function TodoApp({ user, initialTodos }: { user: User; initialTodos: Todo
               </button>
 
               {editingId === todo.id ? (
-                <input
-                  ref={editRef}
-                  value={editText}
-                  onChange={e => setEditText(e.target.value)}
-                  onBlur={() => saveEdit(todo.id)}
-                  onKeyDown={e => {
-                    if (e.key === 'Enter') saveEdit(todo.id)
-                    if (e.key === 'Escape') setEditingId(null)
-                  }}
-                  className="flex-1 bg-transparent border-b border-zinc-600 py-0.5 focus:outline-none text-zinc-100"
-                />
+                <div className="flex-1 flex items-center gap-2">
+                  <input
+                    ref={editRef}
+                    value={editText}
+                    onChange={e => setEditText(e.target.value)}
+                    onBlur={() => saveEdit(todo.id)}
+                    onKeyDown={e => {
+                      if (e.key === 'Enter') saveEdit(todo.id)
+                      if (e.key === 'Escape') setEditingId(null)
+                    }}
+                    className="flex-1 bg-transparent border-b border-zinc-600 py-0.5 focus:outline-none text-zinc-100"
+                    disabled={savingEditId === todo.id}
+                  />
+                  {savingEditId === todo.id && (
+                    <svg className="animate-spin h-5 w-5 text-zinc-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path>
+                    </svg>
+                  )}
+                </div>
               ) : (
                 <span
                   onDoubleClick={() => startEdit(todo)}
